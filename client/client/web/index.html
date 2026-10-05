@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Prompt Library</title>
+    <meta name="description" content="Discover and share AI prompts for image and video generation">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a0e1a">
+    <link rel="icon" type="image/png" href="/static/icon-192.png">
+
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Prompt Library">
+    <link rel="apple-touch-icon" href="/static/icon-192.png">
+
+    <link rel="stylesheet" href="/static/index.css">
+</head>
+
+<body>
+
+    <!-- ═══════════════ SPLASH ═══════════════ -->
+    <div id="splash-screen" class="splash">
+        <img src="/static/splash-logo.png" alt="Prompt Library" class="splash-logo" onerror="this.style.display='none'">
+    </div>
+
+    <!-- ═══════════════ WELCOME ═══════════════ -->
+    <section id="screen-welcome" class="screen auth-screen">
+        <div class="auth-box">
+            <div class="logo">
+                <img src="/static/icon-512.png" alt="Logo" onerror="this.parentElement.textContent='📚'">
+            </div>
+            <h2>PROMPT LIBRARY</h2>
+            <p class="subtitle">Discover &amp; share AI prompts</p>
+            <button class="btn btn-green btn-full" onclick="App.showScreen('home')">Browse without logging in</button>
+            <button class="btn btn-orange btn-full" onclick="App.showScreen('login')">Login</button>
+            <button class="btn btn-ghost btn-full" onclick="App.showScreen('signup')">Sign Up</button>
+        </div>
+    </section>
+
+    <!-- ═══════════════ LOGIN ═══════════════ -->
+    <section id="screen-login" class="screen auth-screen">
+        <div class="auth-box">
+            <h2>Welcome back!</h2>
+            <p class="subtitle">Log in to your account</p>
+            <div class="form-group">
+                <label for="login-user">Username</label>
+                <input type="text" id="login-user" placeholder="Enter username" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="login-pass">Password</label>
+                <input type="password" id="login-pass" placeholder="Enter password" autocomplete="current-password">
+            </div>
+            <p id="login-error" class="error-msg"></p>
+            <button class="btn btn-green btn-full" id="login-btn" onclick="App.login()">Login</button>
+            <button class="btn btn-ghost btn-full btn-sm" style="margin-top:8px" onclick="App.showScreen('welcome')">←
+                Back</button>
+        </div>
+    </section>
+
+    <!-- ═══════════════ SIGNUP ═══════════════ -->
+    <section id="screen-signup" class="screen auth-screen">
+        <div class="auth-box">
+            <h2>Create Account</h2>
+            <p class="subtitle">Join the Prompt Library</p>
+            <div class="form-group">
+                <label for="signup-user">Username</label>
+                <input type="text" id="signup-user" placeholder="Choose a username" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="signup-pass">Password</label>
+                <input type="password" id="signup-pass" placeholder="Choose a password" autocomplete="new-password">
+            </div>
+            <div class="form-group">
+                <label for="signup-confirm">Confirm Password</label>
+                <input type="password" id="signup-confirm" placeholder="Confirm password" autocomplete="new-password">
+            </div>
+            <p id="signup-error" class="error-msg"></p>
+            <button class="btn btn-green btn-full" id="signup-btn" onclick="App.signup()">Sign Up</button>
+            <button class="btn btn-ghost btn-full btn-sm" style="margin-top:8px" onclick="App.showScreen('welcome')">←
+                Back</button>
+        </div>
+    </section>
+
+    <!-- ═══════════════ HOME ═══════════════ -->
+    <section id="screen-home" class="screen">
+        <div class="topbar">
+            <h1>PROMPT LIBRARY</h1>
+            <button class="icon-btn" id="theme-toggle" onclick="App.toggleTheme()" title="Toggle theme">🌙</button>
+            <button class="icon-btn" id="profile-btn" onclick="App.showScreen('profile')" title="Profile">👤</button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="🔍  Search prompts..."
+                oninput="debounceSearch()"
+                onkeydown="if(event.key==='Enter')App.loadPrompts()">
+            <button class="btn btn-cyan btn-sm" onclick="App.loadPrompts()">Search</button>
+        </div>
+
+        <div class="filter-row" id="filter-row">
+            <button class="filter-pill active" data-cat="All" onclick="App.setFilter('All')">All</button>
+            <button class="filter-pill" data-cat="Image" onclick="App.setFilter('Image')">Image</button>
+            <button class="filter-pill" data-cat="Video" onclick="App.setFilter('Video')">Video</button>
+        </div>
+
+        <div class="action-row" id="action-row">
+            <button class="btn btn-orange btn-sm" onclick="App.showBookmarks()">⭐ Favorites</button>
+            <button class="btn btn-teal btn-sm" onclick="App.showScreen('myprompts')">📝 My Prompts</button>
+            <button class="btn btn-coral btn-sm" id="logout-btn" onclick="App.logout()">Logout</button>
+        </div>
+
+        <div class="content-area">
+            <div class="prompt-grid" id="prompt-grid"></div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ DETAIL ═══════════════ -->
+    <section id="screen-detail" class="screen">
+        <div class="topbar">
+            <button class="btn btn-coral btn-sm" onclick="App.showScreen('home')">← Back</button>
+            <h1 id="detail-title-bar">Prompt Details</h1>
+        </div>
+        <div class="content-area">
+            <div class="detail-container" id="detail-content"></div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ UPLOAD ═══════════════ -->
+    <section id="screen-upload" class="screen">
+        <div class="topbar">
+            <h1>📤 Upload Prompt</h1>
+        </div>
+        <div class="content-area">
+            <div class="form-container">
+                <div class="thumb-upload" id="thumb-upload" onclick="document.getElementById('thumb-file').click()">
+                    <div class="upload-icon">🖼️</div>
+                    <div class="upload-text">Click to select thumbnail</div>
+                </div>
+                <input type="file" id="thumb-file" accept="image/*" class="hidden" onchange="App.previewThumb(this)">
+
+                <div class="form-group">
+                    <label for="upload-title">Title</label>
+                    <input type="text" id="upload-title" placeholder="Enter prompt title">
+                </div>
+                <div class="form-group">
+                    <label for="upload-prompt">Prompt</label>
+                    <textarea id="upload-prompt" placeholder="Enter your prompt text"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="upload-category">Category</label>
+                    <select id="upload-category" onchange="App.onCategoryChange()">
+                        <option value="Image">Image</option>
+                        <option value="Video">Video</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="upload-model">AI Model</label>
+                    <select id="upload-model"></select>
+                </div>
+                <div class="form-group">
+                    <label for="upload-tags">Tags (comma separated)</label>
+                    <input type="text" id="upload-tags" placeholder="e.g. portrait, cinematic, neon">
+                </div>
+                <p id="upload-status" class="text-center" style="min-height:22px;font-size:0.85rem;margin:8px 0"></p>
+                <button class="btn btn-green btn-full" id="upload-btn" onclick="App.uploadPrompt()">Upload
+                    Prompt</button>
+                <button class="btn btn-ghost btn-full btn-sm" style="margin-top:10px" onclick="App.showScreen('home')">←
+                    Back</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ MY PROMPTS ═══════════════ -->
+    <section id="screen-myprompts" class="screen">
+        <div class="topbar">
+            <h1>📝 My Prompts</h1>
+            <button class="btn btn-green btn-sm" onclick="App.showScreen('upload')">+ New</button>
+        </div>
+        <div class="content-area">
+            <div class="prompt-grid" id="my-prompts-grid"></div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ PROFILE ═══════════════ -->
+    <section id="screen-profile" class="screen">
+        <div class="profile-container">
+            <div class="profile-avatar">👤</div>
+            <div class="profile-name" id="profile-name">GUEST</div>
+            <button class="btn btn-ghost" onclick="App.showScreen('editprofile')">Edit Profile</button>
+            <button class="btn btn-coral btn-sm" style="margin-top:16px" onclick="App.showScreen('home')">← Back to
+                Home</button>
+        </div>
+    </section>
+
+    <!-- ═══════════════ EDIT PROFILE ═══════════════ -->
+    <section id="screen-editprofile" class="screen">
+        <div class="profile-container">
+            <h2 class="text-cyan" style="margin-bottom:30px">EDIT PROFILE</h2>
+            <button class="btn btn-ghost" id="show-name-btn"
+                onclick="document.getElementById('name-change').classList.toggle('hidden')">Change Name</button>
+            <div id="name-change" class="hidden" style="margin-top:16px;width:280px">
+                <div class="form-group">
+                    <input type="text" id="new-name" placeholder="Enter new name">
+                </div>
+                <button class="btn btn-green btn-sm btn-full" onclick="App.changeName()">Save Name</button>
+            </div>
+            <p id="edit-status" class="text-cyan" style="margin-top:12px;font-size:0.85rem"></p>
+            <button class="btn btn-coral btn-sm" style="margin-top:24px" onclick="App.showScreen('profile')">←
+                Back</button>
+        </div>
+    </section>
+
+    <!-- ═══════════════ BOTTOM NAV ═══════════════ -->
+    <nav class="bottom-nav" id="bottom-nav" style="display:none">
+        <button class="nav-item active" data-screen="home" onclick="App.navTo('home')">
+            <span class="nav-icon">🏠</span>Home
+        </button>
+        <button class="nav-item" data-screen="myprompts" onclick="App.navTo('myprompts')">
+            <span class="nav-icon">📝</span>Mine
+        </button>
+        <button class="nav-item" data-screen="upload" onclick="App.navTo('upload')">
+            <span class="nav-icon">➕</span>Upload
+        </button>
+        <button class="nav-item" data-screen="profile" onclick="App.navTo('profile')">
+            <span class="nav-icon">👤</span>Profile
+        </button>
+    </nav>
+
+    <script src="/static/app.js"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/service-worker.js").catch(() => { });
+        }
+    </script>
+
+</body>
+
+</html>

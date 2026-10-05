@@ -1,0 +1,33 @@
+{
+    "name": "Prompt Library",
+    "short_name": "Prompts",
+    "description": "Discover and share AI prompts for image and video generation",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0e1a",
+    "theme_color": "#0a0e1a",
+    "icons": [
+        {
+            "src": "/static/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Browse Prompts",
+            "url": "/",
+            "icons": [
+                {
+                    "src": "/static/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}

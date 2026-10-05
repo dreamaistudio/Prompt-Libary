@@ -1,0 +1,21 @@
+{
+  "name": "prompt-library",
+  "version": "1.0.0",
+  "description": "Serverless Prompt Library migrated to Netlify Functions and Supabase",
+  "main": "netlify/functions/api.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo \"Static site and serverless functions ready for deployment\""
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "bcryptjs": "^2.4.3",
+    "busboy": "^1.6.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.38.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
